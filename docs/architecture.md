@@ -158,6 +158,19 @@ The knowledge base may include:
 
 ---
 
+## Authentication & Authorization
+
+InfraPilot AI uses JWT authentication and Role-Based Access Control (RBAC).
+
+Two user roles are supported:
+
+- Admin
+- Engineer
+
+Only administrators can manage the Knowledge Base.
+
+Infrastructure Engineers can ask questions, use the Diagnostics Agent, and generate incident reports.
+
 # Deployment
 
 The application is designed to support deployment on the company's local server.

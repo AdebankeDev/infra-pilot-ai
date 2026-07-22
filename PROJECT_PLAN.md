@@ -203,6 +203,19 @@ The project requires the following approved documentation:
 * Incident report template
 * Sample anonymized incident reports (if available)
 
+# Knowledge Base Sources
+
+## Infrastructure SOP
+
+Source:
+Infrastructure Team SOP provided by Xpress Payment Solutions.
+
+Purpose:
+Provides internal procedures and operational knowledge for the AI Knowledge Assistant.
+
+Usage:
+The document will be processed, embedded, and stored in ChromaDB for retrieval.
+
 ---
 
 # Four-Week Development Plan

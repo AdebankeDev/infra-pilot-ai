@@ -23,6 +23,15 @@ Infrastructure engineers often spend valuable time searching through documentati
 - Document Management
 - Role-Based Access Control
 
+### Visual Knowledge Retrieval
+
+When a retrieved SOP section contains screenshots,
+InfraPilot AI displays the relevant screenshot
+alongside the generated answer.
+
+This allows engineers to verify procedures
+using the original documentation.
+
 ## Tech Stack
 
 - Python
