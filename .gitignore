@@ -6,6 +6,14 @@ dist/
 wheels/
 *.egg-info
 
+# Company documents
+data/raw/*.pdf
+
+# Generated images
+data/images/
+
+*.log
+
 # Virtual environments
 .venv
 .env

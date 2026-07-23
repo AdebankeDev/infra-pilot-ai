@@ -1,5 +1,6 @@
 from app.core.config import settings
 from fastapi import FastAPI
+from app.services.llm import generate_response
 
 app = FastAPI(
     title=settings.app_name,
@@ -19,4 +20,13 @@ def health_check():
         "status": "healthy",
         "service": "InfraPilot AI API",
         "version": app.version
+    }
+
+@app.get("/test-llm")
+def test_llm():
+    response = generate_response("Introduce yourself in one sentence.")
+
+    return {
+        "status": "success",
+        "response": response,
     }

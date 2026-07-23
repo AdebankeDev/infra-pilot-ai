@@ -10,10 +10,10 @@ class Settings(BaseSettings):
     # LLM
     llm_provider: str = "openrouter"
     openrouter_api_key: str
-    model_name: str = "openai/gpt-4.1-mini"
+    llm_model: str = "openrouter/free"
 
     # Database
-    database_url: str
+    database_url: str = ""
 
     # ChromaDB
     chroma_db_path: str = "./chroma_db"
