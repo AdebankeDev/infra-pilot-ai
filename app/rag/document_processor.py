@@ -130,6 +130,7 @@ class DocumentProcessor:
 
                 processed_pages.append(
                     {
+                        "document_name": document_name,
                         "page": page_number,
                         "text": text,
                         "images": images,
