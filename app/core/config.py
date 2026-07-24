@@ -23,6 +23,8 @@ class Settings(BaseSettings):
     chroma_persist_directory: str = "./data/chroma_db"
     chroma_collection_name: str = "infrapilot_knowledge_base"
 
+    backend_base_url: str = "http://localhost:8000"
+
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",

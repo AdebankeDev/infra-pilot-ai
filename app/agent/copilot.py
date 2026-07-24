@@ -4,6 +4,7 @@ from langchain_core.messages import HumanMessage
 
 from app.agent.graph import graph
 from app.core.dependencies import get_retriever
+from app.core.config import settings
 
 
 class CopilotService:
@@ -36,7 +37,7 @@ class CopilotService:
         # Retrieve relevant sources for metadata
         retrieved_chunks = get_retriever().search(
             query=question,
-            k=3,
+            k=1,
         )
 
         sources = []
@@ -59,10 +60,20 @@ class CopilotService:
                 metadata.get("source", "Unknown")
             ).stem
 
-            images = [
-                image.replace("\\", "/").replace("data/images", "/images")
-                for image in metadata.get("images", [])[:3]
-            ]
+            
+            images = []
+
+            for image in metadata.get("images", [])[:3]:
+                relative_path = (
+                    Path(image)
+                    .relative_to("data/images")
+                    .as_posix()
+                )
+
+                
+                images.append(
+                    f"{settings.backend_base_url}/images/{relative_path}"
+                )
 
             sources.append(
                 {
