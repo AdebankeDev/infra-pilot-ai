@@ -11,6 +11,7 @@ class Settings(BaseSettings):
     llm_provider: str = "openrouter"
     openrouter_api_key: str
     llm_model: str = "openrouter/free"
+    llm_temperature: float = 0.0
 
     # Database
     database_url: str = ""
@@ -18,7 +19,6 @@ class Settings(BaseSettings):
     # Embeddings
     embedding_model: str = "sentence-transformers/all-MiniLM-L6-v2"
 
-    # ChromaDB
     # ChromaDB
     chroma_persist_directory: str = "./data/chroma_db"
     chroma_collection_name: str = "infrapilot_knowledge_base"

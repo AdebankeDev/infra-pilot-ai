@@ -17,7 +17,7 @@ class Retriever:
     def search(
         self,
         query: str,
-        k: int = 5,
+        k: int = 3,
     ) -> list[dict]:
         """
         Search the knowledge base for relevant document chunks.
