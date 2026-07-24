@@ -42,7 +42,7 @@ class TextChunker:
             for chunk in chunks:
 
                 metadata = {
-                    "document": document_name,
+                    "source": document_name,
                     "page": page_number,
                 }
 
