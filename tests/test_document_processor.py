@@ -1,7 +1,7 @@
 from pathlib import Path
 from pprint import pprint
 
-from app.rag.document_processor import DocumentProcessor
+from app.services.document_processing.document_processor import DocumentProcessor
 
 
 def main():

@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from app.rag.document_processor import DocumentProcessor
+from app.services.document_processing.document_processor import DocumentProcessor
 from app.rag.text_chunker import TextChunker
 from app.storage.vector_store import VectorStore
 

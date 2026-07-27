@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from app.rag.document_processor import DocumentProcessor
+from app.services.document_processing.document_processor import DocumentProcessor
 from app.services.document_indexer import DocumentIndexer
 from app.services.embedding_service import EmbeddingService
 from app.rag.text_chunker import TextChunker
