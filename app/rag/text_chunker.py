@@ -34,10 +34,9 @@ class TextChunker:
         for page in processed_pages:
 
             page_number = page["page"]
-            page_text = page["text"]
+            page_content = page["content"]
             image_paths = page["images"]
-
-            chunks = self.text_splitter.split_text(page_text)
+            chunks = self.text_splitter.split_text(page_content)
 
             for chunk in chunks:
 

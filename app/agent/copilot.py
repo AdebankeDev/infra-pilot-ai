@@ -1,40 +1,62 @@
 from pathlib import Path
+import logging
 
 from langchain_core.messages import HumanMessage
 
 from app.agent.graph import graph
-from app.core.dependencies import get_retriever
 from app.core.config import settings
+from app.core.dependencies import get_retriever
+
+
+logger = logging.getLogger(__name__)
 
 
 class CopilotService:
     """
-    Service for interacting with the Infrastructure Copilot agent.
+    Service for interacting with the Infrastructure Copilot.
     """
 
     def ask(self, question: str) -> dict:
         """
-        Send a question to the Infrastructure Copilot.
+        Send a question to InfraPilot AI.
+
+        Every request is routed through the LangGraph agent.
+        The agent determines whether to answer directly using the LLM
+        or retrieve company documentation through the knowledge_lookup tool.
 
         Args:
-            question: User's question.
+            question:
+                User input.
 
         Returns:
-            The assistant's answer together with source metadata.
+            A dictionary containing the generated answer and
+            any associated source metadata.
         """
 
-        # Invoke the LangGraph agent
+        logger.info("Routing request through LangGraph agent.")
+
         response = graph.invoke(
             {
                 "messages": [
-                    HumanMessage(content=question),
+                    HumanMessage(content=question)
                 ]
             }
         )
 
         answer = response["messages"][-1].content
 
-        # Retrieve relevant sources for metadata
+        sources = self._get_sources(question)
+
+        return {
+            "answer": answer,
+            "sources": sources,
+        }
+
+    def _get_sources(self, question: str) -> list:
+        """
+        Retrieve source metadata for the retrieved company documents.
+        """
+
         retrieved_chunks = get_retriever().search(
             query=question,
             k=1,
@@ -60,7 +82,6 @@ class CopilotService:
                 metadata.get("source", "Unknown")
             ).stem
 
-            
             images = []
 
             for image in metadata.get("images", [])[:3]:
@@ -70,7 +91,6 @@ class CopilotService:
                     .as_posix()
                 )
 
-                
                 images.append(
                     f"{settings.backend_base_url}/images/{relative_path}"
                 )
@@ -83,7 +103,4 @@ class CopilotService:
                 }
             )
 
-        return {
-            "answer": answer,
-            "sources": sources,
-        }
+        return sources

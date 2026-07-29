@@ -14,8 +14,8 @@ class Settings(BaseSettings):
     llm_temperature: float = 0.0
 
     # Database
-    database_url: str = ""
-
+    database_url: str 
+    
     # Embeddings
     embedding_model: str = "sentence-transformers/all-MiniLM-L6-v2"
 

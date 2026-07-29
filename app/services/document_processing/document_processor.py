@@ -81,9 +81,12 @@ class DocumentProcessor:
                 # Extract page text
                 text = self.text_extractor.extract(page)
 
-                # Placeholder for table extraction
-                tables = self.table_extractor.extract(page)
-
+                # Extract tables
+                tables = self.table_extractor.extract(
+                    pdf_path=pdf_path,
+                    page_number=page_number,
+                )
+                
                 # Extract embedded images
                 images = self.image_extractor.extract(
                     document=document,

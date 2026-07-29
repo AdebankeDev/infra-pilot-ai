@@ -21,28 +21,60 @@ class AgentState(TypedDict):
 def knowledge_lookup(query: str) -> str:
     """
     Search the company's knowledge base.
+
+    Returns retrieved documentation together with grounding
+    instructions for the language model.
     """
 
     results = get_knowledge_lookup_tool().search(query=query)
 
     if not results:
-        return "No relevant information was found in the knowledge base."
+        return (
+            "No relevant information was found in the company knowledge base. "
+            "Inform the user that the requested information could not be found "
+            "in the available documentation. Do not generate an answer from "
+            "general knowledge."
+        )
 
-    formatted_results = []
+    sections = []
 
-    for result in results:
+    for index, result in enumerate(results, start=1):
         metadata = result["metadata"]
 
-        formatted_results.append(
+        sections.append(
             f"""
+Document {index}
+----------------
 Source: {metadata["source"]}
 Page: {metadata["page"]}
 
+Content:
 {result["content"]}
 """.strip()
         )
 
-    return "\n\n" + ("\n" + "-" * 60 + "\n\n").join(formatted_results)
+    retrieved_context = "\n\n" + ("=" * 80 + "\n\n").join(sections)
+
+    return f"""
+The following is retrieved company documentation.
+
+This documentation is the authoritative source for answering the user's question.
+
+Instructions:
+
+- Answer ONLY using the retrieved documentation below.
+- Do NOT add information from your own knowledge.
+- Do NOT suggest alternative procedures unless they are documented.
+- Do NOT include PowerShell commands, Windows instructions, troubleshooting steps, or best practices unless they appear in the retrieved documentation.
+- Preserve the documented order of procedural steps.
+- Include the responsible role, estimated TAT, risks, controls, notes, and prerequisites whenever they are present.
+- If the documentation does not completely answer the user's question, explicitly state that the information is not available in the retrieved documentation instead of guessing.
+
+Retrieved Documentation
+=======================
+
+{retrieved_context}
+"""
 
 
 def assistant(state: AgentState):

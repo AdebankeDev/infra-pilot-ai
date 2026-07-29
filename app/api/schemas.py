@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from pydantic import BaseModel, Field
 
 
@@ -22,11 +24,19 @@ class ChatRequest(BaseModel):
         description="User's message to InfraPilot AI.",
     )
 
+    conversation_id: UUID | None = Field(
+        default=None,
+        description="Existing conversation ID. Creates a new conversation if omitted.",
+    )
+
 
 class ChatResponse(BaseModel):
     """
     Response model for chat.
     """
 
+    conversation_id: UUID
+
     answer: str
+
     sources: list[Source]

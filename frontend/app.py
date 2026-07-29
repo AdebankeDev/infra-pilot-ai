@@ -12,6 +12,7 @@ st.set_page_config(
     layout="wide",
 )
 
+
 # -----------------------------
 # Header
 # -----------------------------
@@ -21,11 +22,24 @@ st.caption("Enterprise Infrastructure Knowledge Assistant")
 
 st.divider()
 
+
 # -----------------------------
 # Session State
 # -----------------------------
 if "messages" not in st.session_state:
     st.session_state.messages = []
+
+if "conversation_id" not in st.session_state:
+    st.session_state.conversation_id = None
+
+
+# -----------------------------
+# New Chat Button
+# -----------------------------
+if st.button("🆕 New Chat"):
+    st.session_state.messages = []
+    st.session_state.conversation_id = None
+    st.rerun()
 
 
 # -----------------------------
@@ -77,6 +91,7 @@ question = st.chat_input(
     "Ask an infrastructure question..."
 )
 
+
 if question:
 
     # Display user message immediately
@@ -90,19 +105,29 @@ if question:
         }
     )
 
+
     # Call backend
     with st.chat_message("assistant"):
 
-        with st.spinner(
-            "Searching company documentation..."
-        ):
+        with st.spinner("Thinking..."):
 
-            response = chat(question)
+            response = chat(
+                message=question,
+                conversation_id=st.session_state.conversation_id,
+            )
+
+            # Store conversation ID returned by backend
+            st.session_state.conversation_id = (
+                response["conversation_id"]
+            )
+
 
         answer = response["answer"]
         sources = response["sources"]
 
+
         st.markdown(answer)
+
 
         if sources:
 
@@ -120,6 +145,7 @@ if question:
 
                     images = source.get("images", [])
 
+
                     if images:
 
                         st.markdown(
@@ -133,6 +159,7 @@ if question:
                             )
 
                     st.divider()
+
 
     # Save assistant response
     st.session_state.messages.append(

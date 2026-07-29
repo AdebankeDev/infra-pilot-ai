@@ -15,7 +15,7 @@ class KnowledgeLookupTool:
     def search(
         self,
         query: str,
-        k: int = 3,
+        k: int = 5,
     ) -> list[dict]:
         """
         Search the knowledge base.
