@@ -1,11 +1,16 @@
 from pathlib import Path
 import logging
 
-from langchain_core.messages import HumanMessage
+from langchain_core.messages import (
+    AIMessage,
+    BaseMessage,
+    HumanMessage,
+)
 
 from app.agent.graph import graph
 from app.core.config import settings
 from app.core.dependencies import get_retriever
+from app.db.models.message import Message
 
 
 logger = logging.getLogger(__name__)
@@ -16,30 +21,40 @@ class CopilotService:
     Service for interacting with the Infrastructure Copilot.
     """
 
-    def ask(self, question: str) -> dict:
+    def ask(
+        self,
+        question: str,
+        messages: list[Message],
+    ) -> dict:
         """
         Send a question to InfraPilot AI.
 
-        Every request is routed through the LangGraph agent.
-        The agent determines whether to answer directly using the LLM
-        or retrieve company documentation through the knowledge_lookup tool.
-
         Args:
             question:
-                User input.
+                The current user question. Used for source retrieval.
 
-        Returns:
-            A dictionary containing the generated answer and
-            any associated source metadata.
+            messages:
+                Conversation history retrieved from the database.
         """
+
+        # Convert database messages into LangChain messages
+        history: list[BaseMessage] = []
+
+        for message in messages:
+            if message.role == "user":
+                history.append(
+                    HumanMessage(content=message.content)
+                )
+            else:
+                history.append(
+                    AIMessage(content=message.content)
+                )
 
         logger.info("Routing request through LangGraph agent.")
 
         response = graph.invoke(
             {
-                "messages": [
-                    HumanMessage(content=question)
-                ]
+                "messages": history,
             }
         )
 

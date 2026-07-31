@@ -1,11 +1,22 @@
 from functools import lru_cache
 
-from app.services.llm_service import LLMService
-from app.tools.knowledge_lookup import KnowledgeLookupTool
-from app.rag.retriever import Retriever
-from app.services.embedding_service import EmbeddingService
-from app.storage.vector_store import VectorStore
+from fastapi import Depends
+from sqlalchemy.orm import Session
 
+from app.db.database import get_db
+from app.db.repositories.conversation_repository import ConversationRepository
+from app.db.repositories.message_repository import MessageRepository
+from app.rag.retriever import Retriever
+from app.services.conversation_service import ConversationService
+from app.services.embedding_service import EmbeddingService
+from app.services.llm_service import LLMService
+from app.storage.vector_store import VectorStore
+from app.tools.knowledge_lookup import KnowledgeLookupTool
+
+
+# ==========================================================
+# AI Dependencies (Singletons)
+# ==========================================================
 
 @lru_cache
 def get_embedding_service() -> EmbeddingService:
@@ -41,3 +52,22 @@ def get_knowledge_lookup_tool() -> KnowledgeLookupTool:
 def get_llm_service() -> LLMService:
     """Return the shared LLM service."""
     return LLMService()
+
+
+# ==========================================================
+# Request-scoped Dependencies
+# ==========================================================
+
+def get_conversation_service(
+    db: Session = Depends(get_db),
+) -> ConversationService:
+    """
+    Return a ConversationService for the current request.
+    """
+    conversation_repository = ConversationRepository(db)
+    message_repository = MessageRepository(db)
+
+    return ConversationService(
+        conversation_repository=conversation_repository,
+        message_repository=message_repository,
+    )

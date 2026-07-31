@@ -29,13 +29,6 @@ class ChatService:
     ) -> dict:
         """
         Process a chat request.
-
-        Flow:
-        1. Create or retrieve conversation
-        2. Save user message
-        3. Generate AI response
-        4. Save assistant response
-        5. Return response with conversation ID
         """
 
         # Create a new conversation if this is the first message
@@ -43,19 +36,15 @@ class ChatService:
             conversation = self.conversation_repo.create(
                 title=message[:50]
             )
-
             conversation_id = conversation.id
 
         else:
-            # Verify that the conversation exists
             conversation = self.conversation_repo.get_by_id(
                 conversation_id
             )
 
             if conversation is None:
-                raise ValueError(
-                    "Conversation not found"
-                )
+                raise ValueError("Conversation not found")
 
         # Persist user message
         self.message_repo.create(
@@ -64,10 +53,18 @@ class ChatService:
             content=message,
         )
 
-        # Generate AI response
-        result = self.copilot.ask(message)
+        # Retrieve conversation history from the database
+        messages = self.message_repo.get_by_conversation(
+            conversation_id
+        )
 
-        # Persist assistant message
+        # Let the Copilot handle AI-specific message conversion
+        result = self.copilot.ask(
+            question=message,
+            messages=messages,
+        )
+
+        # Persist assistant response
         self.message_repo.create(
             conversation_id=conversation_id,
             role="assistant",
