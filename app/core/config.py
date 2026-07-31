@@ -25,6 +25,9 @@ class Settings(BaseSettings):
 
     backend_base_url: str = "http://localhost:8000"
 
+    supabase_url: str
+    supabase_anon_key: str
+
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",

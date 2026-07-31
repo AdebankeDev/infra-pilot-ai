@@ -21,6 +21,12 @@ class Conversation(TimestampMixin, Base):
         default=uuid4,
     )
 
+    user_id: Mapped[str] = mapped_column(
+        String(36),
+        nullable=False,
+        index=True,
+    )
+
     title: Mapped[str] = mapped_column(
         String(255),
         nullable=False,
@@ -30,4 +36,3 @@ class Conversation(TimestampMixin, Base):
         back_populates="conversation",
         cascade="all, delete-orphan",
     )
-    

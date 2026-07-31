@@ -14,11 +14,18 @@ class ConversationRepository:
     def __init__(self, db: Session):
         self.db = db
 
-    def create(self, title: str) -> Conversation:
+    def create(
+        self,
+        user_id: str,
+        title: str,
+    ) -> Conversation:
         """
-        Create a new conversation.
+        Create a new conversation for a user.
         """
-        conversation = Conversation(title=title)
+        conversation = Conversation(
+            user_id=user_id,
+            title=title,
+        )
 
         self.db.add(conversation)
         self.db.commit()
@@ -26,28 +33,40 @@ class ConversationRepository:
 
         return conversation
 
-    def get_by_id(self, conversation_id: UUID) -> Conversation | None:
+    def get_by_id(
+        self,
+        conversation_id: UUID,
+        user_id: str,
+    ) -> Conversation | None:
         """
-        Retrieve a conversation by its ID.
+        Retrieve a conversation belonging to a specific user.
         """
         statement = select(Conversation).where(
-            Conversation.id == conversation_id
+            Conversation.id == conversation_id,
+            Conversation.user_id == user_id,
         )
 
         return self.db.scalar(statement)
 
-    def list_all(self) -> list[Conversation]:
+    def list_by_user(
+        self,
+        user_id: str,
+    ) -> list[Conversation]:
         """
-        Retrieve all conversations ordered by newest first.
+        Retrieve all conversations for a user ordered by newest first.
         """
         statement = (
             select(Conversation)
+            .where(Conversation.user_id == user_id)
             .order_by(Conversation.created_at.desc())
         )
 
         return list(self.db.scalars(statement).all())
 
-    def delete(self, conversation: Conversation) -> None:
+    def delete(
+        self,
+        conversation: Conversation,
+    ) -> None:
         """
         Delete a conversation.
         """

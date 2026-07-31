@@ -1,6 +1,26 @@
 import requests
 
-from config import CHAT_ENDPOINT, REQUEST_TIMEOUT
+from auth import get_access_token
+from config import (
+    CHAT_ENDPOINT,
+    CONVERSATIONS_ENDPOINT,
+    REQUEST_TIMEOUT,
+)
+
+
+def _get_headers() -> dict:
+    """
+    Build the Authorization header for authenticated requests.
+    """
+
+    token = get_access_token()
+
+    if not token:
+        return {}
+
+    return {
+        "Authorization": f"Bearer {token}",
+    }
 
 
 def chat(
@@ -9,21 +29,6 @@ def chat(
 ) -> dict:
     """
     Send a user message to the FastAPI backend.
-
-    Args:
-        message:
-            User's message.
-
-        conversation_id:
-            Existing conversation ID.
-            None creates a new conversation.
-
-    Returns:
-        Parsed JSON response.
-
-    Raises:
-        requests.RequestException:
-            If communication with the backend fails.
     """
 
     payload = {
@@ -34,6 +39,41 @@ def chat(
     response = requests.post(
         CHAT_ENDPOINT,
         json=payload,
+        headers=_get_headers(),
+        timeout=REQUEST_TIMEOUT,
+    )
+
+    response.raise_for_status()
+
+    return response.json()
+
+
+def list_conversations() -> list:
+    """
+    Retrieve all conversations for the authenticated user.
+    """
+
+    response = requests.get(
+        CONVERSATIONS_ENDPOINT,
+        headers=_get_headers(),
+        timeout=REQUEST_TIMEOUT,
+    )
+
+    response.raise_for_status()
+
+    return response.json()
+
+
+def get_messages(
+    conversation_id: str,
+) -> list:
+    """
+    Retrieve all messages for a conversation.
+    """
+
+    response = requests.get(
+        f"{CONVERSATIONS_ENDPOINT}/{conversation_id}/messages",
+        headers=_get_headers(),
         timeout=REQUEST_TIMEOUT,
     )
 
