@@ -23,13 +23,22 @@ class DocumentIndexer:
         self.chunker = chunker
         self.vector_store = vector_store
 
-    def index_document(self, pdf_path: Path) -> dict:
+    def index_document(
+        self,
+        pdf_path: Path,
+        document_id: str | None = None,
+    ) -> dict:
         """
         Process a PDF and index it into the vector database.
 
         Args:
             pdf_path:
                 Path to the PDF document.
+
+            document_id:
+                Database ID of the document.
+                Stored in each chunk's metadata to support
+                document management operations such as deletion.
 
         Returns:
             Dictionary containing indexing statistics.
@@ -44,10 +53,15 @@ class DocumentIndexer:
             document_name=pdf_path.name,
         )
 
-        # Step 3: Store document chunks in ChromaDB
+        # Step 3: Attach database document ID to every chunk
+        if document_id:
+            for document in documents:
+                document.metadata["document_id"] = document_id
+
+        # Step 4: Store document chunks in ChromaDB
         self.vector_store.add_documents(documents)
 
-        # Step 4: Return indexing summary
+        # Step 5: Return indexing summary
         return {
             "document": pdf_path.name,
             "pages": len(processed_pages),

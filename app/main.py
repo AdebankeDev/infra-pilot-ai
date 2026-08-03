@@ -4,6 +4,7 @@ from fastapi.staticfiles import StaticFiles
 from app.api.chat import router as chat_router
 from app.api.auth import router as auth_router
 from app.core.config import settings
+from app.api.admin import router as admin_router
 
 
 app = FastAPI(
@@ -15,7 +16,7 @@ app = FastAPI(
 
 app.include_router(chat_router)
 app.include_router(auth_router)
-
+app.include_router(admin_router)
 
 @app.get("/")
 def root():
@@ -35,6 +36,6 @@ def health_check():
 
 app.mount(
     "/images",
-    StaticFiles(directory="data/images"),
+    StaticFiles(directory="storage/images"),
     name="images",
 )
