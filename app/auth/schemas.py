@@ -19,3 +19,4 @@ class TokenResponse(BaseModel):
 class SignupResponse(BaseModel):
     message: str
     email: EmailStr
+

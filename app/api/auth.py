@@ -1,4 +1,5 @@
 from fastapi import APIRouter, HTTPException, status, Depends
+
 from app.auth.dependencies import get_current_user
 
 from app.auth.schemas import (
@@ -22,23 +23,25 @@ router = APIRouter(
     response_model=SignupResponse,
     status_code=status.HTTP_201_CREATED,
 )
-def signup(request: SignupRequest) -> SignupResponse:
+def signup(
+    request: SignupRequest,
+) -> SignupResponse:
 
     try:
         response = auth_service.signup(
             request.email,
-            request.password
+            request.password,
         )
 
         return SignupResponse(
             message="User created successfully",
-            email=response.user.email
+            email=response.user.email,
         )
 
-    except Exception as e:
+    except Exception:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e),
+            detail="Unable to create account.",
         )
 
 
@@ -46,12 +49,14 @@ def signup(request: SignupRequest) -> SignupResponse:
     "/login",
     response_model=TokenResponse,
 )
-def login(request: LoginRequest) -> TokenResponse:
+def login(
+    request: LoginRequest,
+) -> TokenResponse:
 
     try:
         response = auth_service.login(
             request.email,
-            request.password
+            request.password,
         )
 
         session = response.session
@@ -64,14 +69,15 @@ def login(request: LoginRequest) -> TokenResponse:
     except Exception:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid email or password",
+            detail="Invalid email or password.",
         )
+
 
 
 
 @router.get("/me")
 def get_profile(
-    user=Depends(get_current_user)
+    user=Depends(get_current_user),
 ):
     return {
         "id": user.id,

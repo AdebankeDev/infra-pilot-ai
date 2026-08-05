@@ -41,25 +41,40 @@ def show_auth() -> None:
             )
 
             submitted = st.form_submit_button(
-                "Login"
+                "Login",
+                use_container_width=True,
             )
 
             if submitted:
 
-                success = login(
-                    email=email,
-                    password=password,
-                )
+                if not email or not password:
 
-                if success:
-                    st.success(
-                        "Login successful."
+                    st.warning(
+                        "Please enter your email and password."
                     )
-                    st.rerun()
 
-                st.error(
-                    "Invalid email or password."
-                )
+                else:
+
+                    with st.spinner("Signing in..."):
+
+                        success = login(
+                            email=email,
+                            password=password,
+                        )
+
+                    if success:
+
+                        st.success(
+                            "Login successful."
+                        )
+
+                        st.rerun()
+
+                    else:
+
+                        st.error(
+                            "Invalid email or password."
+                        )
 
     # -------------------------
     # Sign Up
@@ -80,28 +95,41 @@ def show_auth() -> None:
             )
 
             submitted = st.form_submit_button(
-                "Create Account"
+                "Create Account",
+                use_container_width=True,
             )
 
             if submitted:
 
-                success = signup(
-                    email=email,
-                    password=password,
-                )
+                if not email or not password:
 
-                if success:
-
-                    st.success(
-                        "Account created successfully."
-                    )
-
-                    st.info(
-                        "You can now log in."
+                    st.warning(
+                        "Please fill in all fields."
                     )
 
                 else:
 
-                    st.error(
-                        "Unable to create account."
-                    )
+                    with st.spinner(
+                        "Creating account..."
+                    ):
+
+                        success = signup(
+                            email=email,
+                            password=password,
+                        )
+
+                    if success:
+
+                        st.success(
+                            "Account created successfully."
+                        )
+
+                        st.info(
+                            "You can now log in using your new credentials."
+                        )
+
+                    else:
+
+                        st.error(
+                            "Unable to create your account. Please try again."
+                        )
