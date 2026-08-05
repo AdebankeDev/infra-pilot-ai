@@ -15,10 +15,9 @@ from uuid import UUID
 from fastapi import status
 
 router = APIRouter(
-    prefix="/admin",
-    tags=["Admin"],
+    prefix="/knowledge-base",
+    tags=["Knowledge Base"],
 )
-
 
 @router.post(
     "/documents",

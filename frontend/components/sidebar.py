@@ -7,9 +7,12 @@ from api import (
 from auth import logout
 
 
-def show_sidebar() -> None:
+def show_sidebar() -> str:
     """
     Render the application sidebar.
+
+    Returns:
+        The currently selected page.
     """
 
     with st.sidebar:
@@ -19,58 +22,70 @@ def show_sidebar() -> None:
         st.divider()
 
         # -----------------------------
-        # New Chat
+        # Navigation
         # -----------------------------
-        if st.button(
-            "🆕 New Chat",
-            use_container_width=True,
-        ):
+        selected_page = st.segmented_control(
+            "Navigation",
 
-            st.session_state.messages = []
-            st.session_state.conversation_id = None
+            ["Chat", "Knowledge Base"],
 
-            st.rerun()
+            default="Chat",
+        )
 
         st.divider()
 
         # -----------------------------
-        # Conversation History
+        # Chat Sidebar
         # -----------------------------
-        st.subheader("Conversations")
+        if selected_page == "Chat":
 
-        conversations = list_conversations()
+            if st.button(
+                "🆕 New Chat",
+                use_container_width=True,
+            ):
 
-        if not conversations:
+                st.session_state.messages = []
+                st.session_state.conversation_id = None
 
-            st.caption("No conversations yet.")
+                st.rerun()
 
-        else:
+            st.divider()
 
-            for conversation in conversations:
+            st.subheader("Conversations")
 
-                if st.button(
-                    conversation["title"],
-                    key=str(conversation["id"]),
-                    use_container_width=True,
-                ):
+            conversations = list_conversations()
 
-                    messages = get_messages(
-                        str(conversation["id"])
-                    )
+            if not conversations:
 
-                    st.session_state.conversation_id = (
-                        conversation["id"]
-                    )
+                st.caption("No conversations yet.")
 
-                    st.session_state.messages = [
-                        {
-                            "role": message["role"],
-                            "content": message["content"],
-                        }
-                        for message in messages
-                    ]
+            else:
 
-                    st.rerun()
+                for conversation in conversations:
+
+                    if st.button(
+                        conversation["title"],
+                        key=str(conversation["id"]),
+                        use_container_width=True,
+                    ):
+
+                        messages = get_messages(
+                            str(conversation["id"])
+                        )
+
+                        st.session_state.conversation_id = (
+                            conversation["id"]
+                        )
+
+                        st.session_state.messages = [
+                            {
+                                "role": message["role"],
+                                "content": message["content"],
+                            }
+                            for message in messages
+                        ]
+
+                        st.rerun()
 
         st.divider()
 
@@ -85,3 +100,5 @@ def show_sidebar() -> None:
             logout()
 
             st.rerun()
+
+    return selected_page

@@ -30,6 +30,11 @@ class KnowledgeBaseService:
 
         self.repository = DocumentRepository(db)
 
+    def _create_document_indexer(self) -> DocumentIndexer:
+        """
+        Create a document indexer only when vector operations are required.
+        """
+
         embedding_service = EmbeddingService()
 
         vector_store = VectorStore(
@@ -42,7 +47,7 @@ class KnowledgeBaseService:
 
         chunker = TextChunker()
 
-        self.document_indexer = DocumentIndexer(
+        return DocumentIndexer(
             processor=processor,
             chunker=chunker,
             vector_store=vector_store,
@@ -52,6 +57,7 @@ class KnowledgeBaseService:
         """
         Retrieve all indexed documents.
         """
+
         return self.repository.list_documents()
 
     def upload_document(
@@ -73,7 +79,7 @@ class KnowledgeBaseService:
             )
 
         existing = self.repository.get_by_filename(
-            file.filename
+            file.filename,
         )
 
         if existing:
@@ -96,8 +102,10 @@ class KnowledgeBaseService:
 
         document = self.repository.create(document)
 
+        document_indexer = self._create_document_indexer()
+
         try:
-            result = self.document_indexer.index_document(
+            result = document_indexer.index_document(
                 pdf_path=file_path,
                 document_id=str(document.id),
             )
@@ -130,7 +138,9 @@ class KnowledgeBaseService:
         - Database record
         """
 
-        document = self.repository.get_by_id(document_id)
+        document = self.repository.get_by_id(
+            document_id,
+        )
 
         if not document:
             raise HTTPException(
@@ -138,8 +148,10 @@ class KnowledgeBaseService:
                 detail="Document not found.",
             )
 
+        document_indexer = self._create_document_indexer()
+
         # Delete vectors from ChromaDB
-        self.document_indexer.vector_store.delete_document(
+        document_indexer.vector_store.delete_document(
             document_id=str(document.id),
         )
 
@@ -150,7 +162,9 @@ class KnowledgeBaseService:
             file_path.unlink()
 
         # Delete extracted screenshots
-        image_directory = self.IMAGES_DIR / Path(document.filename).stem
+        image_directory = (
+            self.IMAGES_DIR / Path(document.filename).stem
+        )
 
         if image_directory.exists():
             shutil.rmtree(image_directory)
