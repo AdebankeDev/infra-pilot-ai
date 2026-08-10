@@ -1,17 +1,14 @@
-version: "3.9"
-
 services:
+
   postgres:
     image: postgres:17
-
     container_name: infrapilot-postgres
-
     restart: unless-stopped
 
     environment:
       POSTGRES_DB: infrapilot_ai
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: adebanke
+      POSTGRES_PASSWORD: password
 
     ports:
       - "5432:5432"
@@ -19,5 +16,61 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U adebanke -d infrapilot_ai"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  backend:
+    build:
+      context: .
+
+    container_name: infrapilot-backend
+    restart: unless-stopped
+
+    env_file:
+      - .env
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+    ports:
+      - "8000:8000"
+
+    volumes:
+      - chroma_data:/app/data/chroma_db
+      - storage_data:/app/storage
+      - huggingface_cache:/app/.cache/huggingface
+
+    environment:
+      HF_HOME: /app/.cache/huggingface
+
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+
+    container_name: infrapilot-frontend
+    restart: unless-stopped
+
+    env_file:
+      - .env
+
+    environment:
+      BACKEND_BASE_URL: http://backend:8000
+
+    depends_on:
+      backend:
+        condition: service_started
+
+    ports:
+      - "8501:8501"
+
 volumes:
   postgres_data:
+  chroma_data:
+  storage_data:
+  huggingface_cache:

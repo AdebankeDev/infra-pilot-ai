@@ -66,12 +66,16 @@ def login(
             refresh_token=session.refresh_token,
         )
 
-    except Exception:
+    except AuthApiError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid email or password.",
         )
-
+    except Exception:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Login failed unexpectedly.",
+        )
 
 
 

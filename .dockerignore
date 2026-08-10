@@ -1,0 +1,14 @@
+.venv
+.git
+__pycache__
+*.pyc
+data/chroma_db
+storage/
+tests/
+docs/
+diagrams/
+.env
+.env.*
+*.md
+.pytest_cache
+alembic/versions/__pycache__

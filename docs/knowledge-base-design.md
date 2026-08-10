@@ -135,24 +135,6 @@ Embeddings are **not** stored in PostgreSQL.
 
 ---
 
-# Document Organization
-
-Each document belongs to a document type.
-
-Examples include:
-
-| Document | Type |
-|----------|------|
-| Infrastructure SOP | SOP |
-| Password Reset Runbook | Runbook |
-| Infrastructure Policy | Policy |
-| VPN Troubleshooting Guide | Troubleshooting Guide |
-| Infrastructure FAQ | FAQ |
-
-Document type determines how the document will be processed during ingestion.
-
----
-
 # Document Metadata
 
 Each document stored in the knowledge base contains descriptive metadata.
@@ -163,12 +145,10 @@ Typical metadata includes:
 |---------|-------------|
 | document_id | Unique identifier |
 | document_name | Original file name |
-| document_type | SOP, Runbook, Policy, etc. |
 | file_path | Storage location |
 | file_hash | Used to detect duplicate documents |
-| uploaded_by | Administrator who uploaded the document |
 | upload_date | Date uploaded |
-| status | Active or Archived |
+
 
 At the chunk level, additional metadata is stored in ChromaDB:
 
@@ -183,22 +163,6 @@ At the chunk level, additional metadata is stored in ChromaDB:
 | chunk_text | Text used for embedding |
 
 This metadata improves retrieval accuracy and source attribution.
-
----
-
-# Knowledge Base Management
-
-The knowledge base is managed exclusively by users with the **Admin** role.
-
-Administrators can:
-
-- Upload new documents.
-- Update existing documents.
-- Delete outdated documents.
-- Trigger document indexing.
-- Maintain the quality of organizational knowledge.
-
-Infrastructure Engineers cannot modify the knowledge base.
 
 ---
 

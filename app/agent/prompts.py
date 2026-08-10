@@ -21,6 +21,7 @@ These include:
 - Runbooks
 - Internal procedures
 - Company policies
+-Frequently Asked Questions (FAQs)
 - Internal systems
 - Infrastructure operations specific to the organization
 

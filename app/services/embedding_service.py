@@ -13,10 +13,10 @@ class EmbeddingService:
         logger.info("Initializing EmbeddingService...")
 
         self.embeddings = HuggingFaceEmbeddings(
-            model_name=settings.embedding_model
+            model_name=settings.embedding_model,
+            cache_folder="/app/.cache/huggingface",
         )
 
     def get_embeddings(self) -> HuggingFaceEmbeddings:
         """Return the configured embedding model."""
-
         return self.embeddings

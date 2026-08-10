@@ -1,6 +1,7 @@
 import streamlit as st
 
 from api import chat
+from utils.sources import display_sources
 
 
 def show_chat() -> None:
@@ -27,12 +28,25 @@ def show_chat() -> None:
         st.session_state.conversation_id = None
 
     # -----------------------------
-    # New Chat Button
+    # Empty State
     # -----------------------------
-    if st.button("🆕 New Chat"):
-        st.session_state.messages = []
-        st.session_state.conversation_id = None
-        st.rerun()
+    if not st.session_state.messages:
+
+        st.info(
+            """
+            👋 Welcome to InfraPilot AI.
+
+            Your AI assistant for enterprise infrastructure operations.
+
+            You can ask about:
+
+            • Nutanix troubleshooting
+            • Server administration
+            • Backup procedures
+            • Infrastructure SOPs
+            • Operational runbooks
+            """
+        )
 
     # -----------------------------
     # Display Chat History
@@ -45,37 +59,9 @@ def show_chat() -> None:
 
             if message["role"] == "assistant":
 
-                sources = message.get("sources", [])
-
-                if sources:
-
-                    with st.expander("📄 View Sources"):
-
-                        for source in sources:
-
-                            st.markdown(
-                                f"**Document:** {source['document']}"
-                            )
-
-                            st.markdown(
-                                f"**Page:** {source['page']}"
-                            )
-
-                            images = source.get("images", [])
-
-                            if images:
-
-                                st.markdown(
-                                    "**Associated Screenshots**"
-                                )
-
-                                for image in images:
-                                    st.image(
-                                        image,
-                                        use_container_width=True,
-                                    )
-
-                            st.divider()
+                display_sources(
+                    message.get("sources", [])
+                )
 
     # -----------------------------
     # Chat Input
@@ -87,8 +73,11 @@ def show_chat() -> None:
     if not question:
         return
 
-    # Display user message immediately
+    # -----------------------------
+    # Display User Message
+    # -----------------------------
     with st.chat_message("user"):
+
         st.markdown(question)
 
     st.session_state.messages.append(
@@ -98,7 +87,9 @@ def show_chat() -> None:
         }
     )
 
-    # Call backend
+    # -----------------------------
+    # Call Backend
+    # -----------------------------
     with st.chat_message("assistant"):
 
         with st.spinner("Thinking..."):
@@ -117,36 +108,11 @@ def show_chat() -> None:
 
         st.markdown(answer)
 
-        if sources:
+        display_sources(sources)
 
-            with st.expander("📄 View Sources"):
-
-                for source in sources:
-
-                    st.markdown(
-                        f"**Document:** {source['document']}"
-                    )
-
-                    st.markdown(
-                        f"**Page:** {source['page']}"
-                    )
-
-                    images = source.get("images", [])
-
-                    if images:
-
-                        st.markdown(
-                            "**Associated Screenshots**"
-                        )
-
-                        for image in images:
-                            st.image(
-                                image,
-                                use_container_width=True,
-                            )
-
-                    st.divider()
-
+    # -----------------------------
+    # Save Assistant Response
+    # -----------------------------
     st.session_state.messages.append(
         {
             "role": "assistant",

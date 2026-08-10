@@ -5,6 +5,11 @@ from api import (
     list_conversations,
 )
 from auth import logout
+from utils.text import generate_conversation_title
+
+
+# Number of recent conversations to display
+MAX_CONVERSATIONS = 10
 
 
 def show_sidebar() -> str:
@@ -26,9 +31,7 @@ def show_sidebar() -> str:
         # -----------------------------
         selected_page = st.segmented_control(
             "Navigation",
-
             ["Chat", "Knowledge Base"],
-
             default="Chat",
         )
 
@@ -55,6 +58,9 @@ def show_sidebar() -> str:
 
             conversations = list_conversations()
 
+            # Show only the most recent conversations
+            conversations = conversations[:MAX_CONVERSATIONS]
+
             if not conversations:
 
                 st.caption("No conversations yet.")
@@ -63,8 +69,12 @@ def show_sidebar() -> str:
 
                 for conversation in conversations:
 
+                    conversation_title = generate_conversation_title(
+                        conversation["title"]
+                    )
+
                     if st.button(
-                        conversation["title"],
+                        conversation_title,
                         key=str(conversation["id"]),
                         use_container_width=True,
                     ):

@@ -102,12 +102,12 @@ class CopilotService:
             for image in metadata.get("images", [])[:3]:
                 relative_path = (
                     Path(image)
-                    .relative_to("data/images")
+                    .relative_to("storage/images")
                     .as_posix()
                 )
 
                 images.append(
-                    f"{settings.backend_base_url}/images/{relative_path}"
+                    f"{settings.public_backend_url}/images/{relative_path}"
                 )
 
             sources.append(

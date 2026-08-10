@@ -22,7 +22,6 @@ Stores user authentication and account information.
 | username | VARCHAR | Username |
 | email | VARCHAR | Email Address |
 | password_hash | TEXT | Hashed Password |
-| role | VARCHAR | User Role |
 | created_at | TIMESTAMP | Account Creation Date |
 
 ---

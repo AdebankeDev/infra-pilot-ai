@@ -23,7 +23,9 @@ class Settings(BaseSettings):
     chroma_persist_directory: str = "./data/chroma_db"
     chroma_collection_name: str = "infrapilot_knowledge_base"
 
+    # Backend
     backend_base_url: str = "http://localhost:8000"
+    public_backend_url: str = "http://172.21.51.99:8000"
 
     supabase_url: str
     supabase_anon_key: str
