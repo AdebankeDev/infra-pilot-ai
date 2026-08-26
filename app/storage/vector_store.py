@@ -41,7 +41,7 @@ class VectorStore:
     def similarity_search(
         self,
         query: str,
-        k: int = 5,
+        k: int = 3,
     ) -> list[Document]:
         """
         Retrieve the most similar documents.

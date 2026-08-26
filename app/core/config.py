@@ -8,9 +8,9 @@ class Settings(BaseSettings):
     debug: bool = True
 
     # LLM
-    llm_provider: str = "openrouter"
-    openrouter_api_key: str
-    llm_model: str = "openrouter/free"
+    llm_provider: str = "ollama"
+    ollama_base_url: str = "http://ollama:11434"
+    llm_model: str = "llama3.2:3b"
     llm_temperature: float = 0.0
 
     # Database

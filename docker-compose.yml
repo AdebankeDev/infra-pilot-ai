@@ -23,6 +23,40 @@ services:
       retries: 5
       start_period: 10s
 
+
+  ollama:
+    image: ollama/ollama:latest
+    container_name: infrapilot-ollama
+    restart: unless-stopped
+
+    ports:
+      - "11434:11434"
+
+    volumes:
+      - ollama_data:/root/.ollama
+
+    healthcheck:
+      test: ["CMD-SHELL", "ollama list || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+
+  ollama-init:
+    image: ollama/ollama:latest
+    container_name: infrapilot-ollama-init
+
+    depends_on:
+      ollama:
+        condition: service_healthy
+
+    entrypoint: >
+      sh -c "OLLAMA_HOST=ollama:11434 ollama pull llama3.2:3b"
+
+    restart: "no"
+
+
   backend:
     build:
       context: .
@@ -36,6 +70,8 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+      ollama:
+        condition: service_healthy
 
     ports:
       - "8000:8000"
@@ -47,6 +83,8 @@ services:
 
     environment:
       HF_HOME: /app/.cache/huggingface
+      OLLAMA_BASE_URL: http://ollama:11434
+
 
   frontend:
     build:
@@ -69,8 +107,10 @@ services:
     ports:
       - "8501:8501"
 
+
 volumes:
   postgres_data:
   chroma_data:
   storage_data:
   huggingface_cache:
+  ollama_data:

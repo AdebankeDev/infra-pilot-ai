@@ -21,6 +21,20 @@ class CopilotService:
     Service for interacting with the Infrastructure Copilot.
     """
 
+    MAX_HISTORY_MESSAGES = 6  # last 3 user+assistant exchanges
+
+    # Messages that should never trigger the RAG/agent workflow.
+    SMALL_TALK = {
+        "hi",
+        "hello",
+        "hey",
+        "thanks",
+        "thank you",
+        "good morning",
+        "good afternoon",
+        "good evening",
+    }
+
     def ask(
         self,
         question: str,
@@ -31,16 +45,36 @@ class CopilotService:
 
         Args:
             question:
-                The current user question. Used for source retrieval.
+                The current user question.
 
             messages:
                 Conversation history retrieved from the database.
         """
 
+        # ==========================================================
+        # Handle obvious small talk without invoking the AI agent
+        # ==========================================================
+
+        normalized = question.strip().lower()
+
+        if normalized in self.SMALL_TALK:
+            logger.info("Small-talk message detected. Skipping LangGraph.")
+
+            return {
+                "answer": "Hello! How can I help with your infrastructure question today?",
+                "sources": [],
+            }
+
+        # ==========================================================
+        # Limit conversation history
+        # ==========================================================
+
+        recent_messages = messages[-self.MAX_HISTORY_MESSAGES:]
+
         # Convert database messages into LangChain messages
         history: list[BaseMessage] = []
 
-        for message in messages:
+        for message in recent_messages:
             if message.role == "user":
                 history.append(
                     HumanMessage(content=message.content)
@@ -52,6 +86,10 @@ class CopilotService:
 
         logger.info("Routing request through LangGraph agent.")
 
+        # ==========================================================
+        # Generate AI response
+        # ==========================================================
+
         response = graph.invoke(
             {
                 "messages": history,
@@ -59,6 +97,10 @@ class CopilotService:
         )
 
         answer = response["messages"][-1].content
+
+        # ==========================================================
+        # Retrieve source metadata
+        # ==========================================================
 
         sources = self._get_sources(question)
 
@@ -74,7 +116,7 @@ class CopilotService:
 
         retrieved_chunks = get_retriever().search(
             query=question,
-            k=1,
+            k=3,
         )
 
         sources = []

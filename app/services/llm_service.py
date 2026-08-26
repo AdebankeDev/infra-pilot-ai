@@ -1,6 +1,6 @@
 import logging
 
-from langchain_openai import ChatOpenAI
+from langchain_ollama import ChatOllama
 from langchain_core.messages import BaseMessage
 
 from app.core.config import settings
@@ -21,11 +21,11 @@ class LLMService:
     def __init__(self):
         logger.info("Initializing LLMService...")
 
-        self._llm = ChatOpenAI(
+        self._llm = ChatOllama(
             model=settings.llm_model,
-            api_key=settings.openrouter_api_key,
-            base_url="https://openrouter.ai/api/v1",
+            base_url=settings.ollama_base_url,
             temperature=settings.llm_temperature,
+            num_predict=256,
         )
 
     def invoke(self, messages: list[BaseMessage]):
@@ -48,6 +48,6 @@ class LLMService:
             tools: LangChain tools.
 
         Returns:
-            ChatOpenAI configured for tool calling.
+            ChatOllama configured for tool calling.
         """
         return self._llm.bind_tools(tools)
