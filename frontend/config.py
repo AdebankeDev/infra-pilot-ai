@@ -33,4 +33,4 @@ DOCUMENTS_ENDPOINT = f"{API_BASE_URL}/knowledge-base/documents"
 # General
 # ==========================================================
 
-REQUEST_TIMEOUT = 300
+REQUEST_TIMEOUT = 600
